@@ -19,7 +19,7 @@ typedef struct struct_name { \
 #define VECTOR_FOREACH(vec_ptr, element_ptr_name) \
 for (__auto_type element_ptr_name = (vec_ptr)->elements; element_ptr_name < &((vec_ptr)->elements[(vec_ptr)->size]);  ++element_ptr_name)
 
-#define VECTOR_FOREACH_REVERSED(vec_ptr, element_ptr_name) \
+#define VECTOR_REVERSED_FOREACH(vec_ptr, element_ptr_name) \
 for (__auto_type element_ptr_name = &((vec_ptr)->elements[(vec_ptr)->size-1]); element_ptr_name >= (vec_ptr)->elements;  --element_ptr_name)
 
 // ----- Declare common functions for the container -----
