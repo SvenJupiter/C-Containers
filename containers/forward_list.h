@@ -1,7 +1,7 @@
 #ifndef SJ_FORWARD_LIST_H
 #define SJ_FORWARD_LIST_H
 
-#include <stddef.h> // NULL
+#include <stddef.h> // NULL, size_t
 #include <stdbool.h> // bool
 #include <stdlib.h> // malloc, free
 #include <string.h> // memcpy, memset
@@ -85,7 +85,7 @@ bool forward_list_emty_func_name(list_type* const list_ptr)
 element_type* forward_list_front_func_name(list_type* const list_ptr)
 
 #define FORWARD_LIST_DECLARE_ASSIGN_FUNC(forward_list_assign_func_name, list_type, element_type) \
-void forward_list_assign_func_name(list_type* const list_ptr, const element_type* const new_elements, const unsigned int new_size)
+void forward_list_assign_func_name(list_type* const list_ptr, const element_type* const new_elements, const size_t new_size)
 
 #define FORWARD_LIST_DECLARE_EMPLACE_FRONT_FUNC(forward_list_emplace_front_func_name, list_type, element_type) \
 element_type* forward_list_emplace_front_func_name(list_type* const list_ptr, const bool fill_zeros)
@@ -97,19 +97,19 @@ element_type* forward_list_push_front_func_name(list_type* const list_ptr, const
 void forward_list_pop_front_func_name(list_type* const list_ptr)
 
 #define FORWARD_LIST_DECLARE_EMPLACE_AFTER_FUNC(forward_list_emplace_after_func_name, list_type, element_type) \
-element_type* forward_list_emplace_after_func_name(list_type* const list_ptr, const unsigned int position, const bool fill_zeros)
+element_type* forward_list_emplace_after_func_name(list_type* const list_ptr, const size_t position, const bool fill_zeros)
 
 #define FORWARD_LIST_DECLARE_INSERT_AFTER_FUNC(forward_list_insert_after_func_name, list_type, element_type) \
-element_type* forward_list_insert_after_func_name(list_type* const list_ptr, const unsigned int position, const element_type* const new_element)
+element_type* forward_list_insert_after_func_name(list_type* const list_ptr, const size_t position, const element_type* const new_element)
 
 #define FORWARD_LIST_DECLARE_ERASE_AFTER_FUNC(forward_list_erase_after_func_name, list_type) \
-void forward_list_erase_after_func_name(list_type* const list_ptr, const unsigned int position)
+void forward_list_erase_after_func_name(list_type* const list_ptr, const size_t position)
 
 #define FORWARD_LIST_DECLARE_SWAP_FUNC(forward_list_swap_func_name, list_type) \
 void forward_list_swap_func_name(list_type* const list_a_ptr, list_type* const list_b_ptr)
 
 #define FORWARD_LIST_DECLARE_RESIZE_FUNC(forward_list_resize_func_name, list_type, element_type) \
-void forward_list_resize_func_name(list_type* const list_ptr, const unsigned int new_size, const element_type* const value_ptr)
+void forward_list_resize_func_name(list_type* const list_ptr, const size_t new_size, const element_type* const value_ptr)
 
 #define FORWARD_LIST_DECLARE_CLEAR_FUNC(forward_list_clear_func_name, list_type) \
 void forward_list_clear_func_name(list_type* const list_ptr)
@@ -143,7 +143,7 @@ element_type* forward_list_front_func_name(list_type* const list_ptr) { \
 }
 
 #define FORWARD_LIST_DEFINE_ASSIGN_FUNC(forward_list_assign_func_name, list_type, element_type) \
-void forward_list_assign_func_name(list_type* const list_ptr, const element_type* const new_elements, const unsigned int new_size) { \
+void forward_list_assign_func_name(list_type* const list_ptr, const element_type* const new_elements, const size_t new_size) { \
     if (list_ptr == NULL ) { return; } \
     typeof(list_ptr->root) next_node; \
     for (__auto_type current_node = list_ptr->root; current_node != NULL; current_node = next_node) { \
@@ -162,7 +162,7 @@ void forward_list_assign_func_name(list_type* const list_ptr, const element_type
         memcpy(&(list_ptr->root->element), &(new_elements[0]), sizeof(element_type)); \
         __auto_type prev_node = list_ptr->root; \
         typeof(list_ptr->root) new_node; \
-        for (unsigned int i = 1; i < new_size; ++i) { \
+        for (size_t i = 1; i < new_size; ++i) { \
             new_node = malloc(sizeof(*(list_ptr->root))); \
             if (new_node == NULL) { return; } \
             new_node->next = NULL; \
@@ -206,11 +206,11 @@ void forward_list_pop_front_func_name(list_type* const list_ptr) { \
 }
 
 #define FORWARD_LIST_DEFINE_EMPLACE_AFTER_FUNC(forward_list_emplace_after_func_name, list_type, element_type) \
-element_type* forward_list_emplace_after_func_name(list_type* const list_ptr, const unsigned int position, const bool fill_zeros) { \
+element_type* forward_list_emplace_after_func_name(list_type* const list_ptr, const size_t position, const bool fill_zeros) { \
     if (list_ptr == NULL) { return NULL; } \
     if (list_ptr->root == NULL) { return NULL; } \
     __auto_type prev_node = list_ptr->root; \
-    unsigned int count = 0; \
+    size_t count = 0; \
     while (count < position && prev_node != NULL) { ++count; prev_node = prev_node->next; } \
     if (prev_node == NULL) { return NULL; } \
     else { \
@@ -226,12 +226,12 @@ element_type* forward_list_emplace_after_func_name(list_type* const list_ptr, co
 }
 
 #define FORWARD_LIST_DEFINE_INSERT_AFTER_FUNC(forward_list_insert_after_func_name, list_type, element_type) \
-element_type* forward_list_insert_after_func_name(list_type* const list_ptr, const unsigned int position, const element_type* const new_element) { \
+element_type* forward_list_insert_after_func_name(list_type* const list_ptr, const size_t position, const element_type* const new_element) { \
     if (list_ptr == NULL) { return NULL; } \
     if (list_ptr->root == NULL) { return NULL; } \
     if (new_element == NULL) { return NULL; } \
     __auto_type prev_node = list_ptr->root; \
-    unsigned int count = 0; \
+    size_t count = 0; \
     while (count < position && prev_node != NULL) { ++count; prev_node = prev_node->next; } \
     if (prev_node == NULL) { return NULL; } \
     else { \
@@ -247,11 +247,11 @@ element_type* forward_list_insert_after_func_name(list_type* const list_ptr, con
 }
 
 #define FORWARD_LIST_DEFINE_ERASE_AFTER_FUNC(forward_list_erase_after_func_name, list_type) \
-void forward_list_erase_after_func_name(list_type* const list_ptr, const unsigned int position) { \
+void forward_list_erase_after_func_name(list_type* const list_ptr, const size_t position) { \
     if (list_ptr == NULL) { return; } \
     if (list_ptr->root == NULL) { return; } \
     __auto_type prev_node = list_ptr->root; \
-    unsigned int count = 0; \
+    size_t count = 0; \
     while (count < position && prev_node != NULL) { ++count; prev_node = prev_node->next; } \
     if (prev_node == NULL) { return; } \
     else if (prev_node->next == NULL) { return; } \
@@ -272,7 +272,7 @@ void forward_list_swap_func_name(list_type* const list_a_ptr, list_type* const l
 }
 
 #define FORWARD_LIST_DEFINE_RESIZE_FUNC(forward_list_resize_func_name, list_type, element_type) \
-void forward_list_resize_func_name(list_type* const list_ptr, const unsigned int new_size, const element_type* const value_ptr) { \
+void forward_list_resize_func_name(list_type* const list_ptr, const size_t new_size, const element_type* const value_ptr) { \
     if (list_ptr == NULL) { return; } \
     if (new_size == 0) { \
         typeof(list_ptr->root) next_node; \
@@ -294,7 +294,7 @@ void forward_list_resize_func_name(list_type* const list_ptr, const unsigned int
         } \
         __auto_type prev_node = list_ptr->root; \
         typeof(list_ptr->root) new_node; \
-        for (unsigned int i = 1; i < new_size; ++i) { \
+        for (size_t i = 1; i < new_size; ++i) { \
             new_node = malloc(sizeof(*(list_ptr->root))); \
             if (new_node == NULL) { return; } \
             new_node->next = NULL; \
@@ -310,14 +310,14 @@ void forward_list_resize_func_name(list_type* const list_ptr, const unsigned int
     } \
     else { \
         __auto_type prev_node = list_ptr->root; \
-        unsigned int count = 1; \
+        size_t count = 1; \
         while (count < new_size && prev_node->next != NULL) {  \
             ++count; \
             prev_node = prev_node->next; \
         } \
         if (count < new_size) { \
             typeof(list_ptr->root) new_node; \
-            for (unsigned int i = count; i < new_size; ++i) { \
+            for (size_t i = count; i < new_size; ++i) { \
                 new_node = malloc(sizeof(*(list_ptr->root))); \
                 if (new_node == NULL) { return; } \
                 new_node->next = NULL; \

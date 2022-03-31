@@ -1,7 +1,7 @@
 #ifndef SJ_VECTOR_CONTAINER_H
 #define SJ_VECTOR_CONTAINER_H
 
-#include <stddef.h> // NULL
+#include <stddef.h> // NULL, size_t
 #include <stdbool.h> // bool
 #include <stdlib.h> // malloc, realloc, free
 #include <string.h> // memset, memcpy, memmove
@@ -10,8 +10,8 @@
 #define VECTOR_DEFINE_CONTAINER(element_type, struct_name, vector_type) \
 typedef struct struct_name { \
     element_type* elements; \
-    unsigned int size; \
-    unsigned int capacity; \
+    size_t size; \
+    size_t capacity; \
 } vector_type
 
 #define VECTOR_FOREACH(vec_ptr, element_ptr_name) \
@@ -79,19 +79,19 @@ VECTOR_DEFINE_DESTRUCT_FUNC(vector_destruct_func_name, vector_type)
 // ----- Macros for declaring functions -----
 
 #define VECTOR_DECLARE_CONSTRUCT_FUNC(vector_construct_func_name, vector_type) \
-vector_type vector_construct_func_name(const unsigned int initial_capacity)
+vector_type vector_construct_func_name(const size_t initial_capacity)
 
 #define VECTOR_DECLARE_RESERVE_FUNC(vector_reserve_func_name, vector_type) \
-void vector_reserve_func_name(vector_type* const vec_ptr, const unsigned int new_capacity)
+void vector_reserve_func_name(vector_type* const vec_ptr, const size_t new_capacity)
 
 #define VECTOR_DECLARE_RESIZE_FUNC(vector_resize_func_name, vector_type, element_type) \
-void vector_resize_func_name(vector_type* const vec_ptr, const unsigned int new_size, const element_type* const value_ptr)
+void vector_resize_func_name(vector_type* const vec_ptr, const size_t new_size, const element_type* const value_ptr)
 
 #define VECTOR_DECLARE_SHRINK_TO_FIT_FUNC(vector_shrink_to_fit_func_name, vector_type) \
 void vector_shrink_to_fit_func_name(vector_type* const vec_ptr)
 
 #define VECTOR_DECLARE_AT_FUNC(vector_at_func_name, vector_type, element_type) \
-element_type* vector_at_func_name(vector_type* const vec_ptr, const unsigned int position)
+element_type* vector_at_func_name(vector_type* const vec_ptr, const size_t position)
 
 #define VECTOR_DECLARE_FRONT_FUNC(vector_front_func_name, vector_type, element_type) \
 element_type* vector_front_func_name(vector_type* const vec_ptr)
@@ -103,16 +103,16 @@ element_type* vector_back_func_name(vector_type* const vec_ptr)
 element_type* vector_data_func_name(vector_type* const vec_ptr)
 
 #define VECTOR_DECLARE_SIZE_FUNC(vector_size_func_name, vector_type) \
-unsigned int vector_size_func_name(vector_type* const vec_ptr)
+size_t vector_size_func_name(vector_type* const vec_ptr)
 
 #define VECTOR_DECLARE_CAPACITY_FUNC(vector_capacity_func_name, vector_type) \
-unsigned int vector_capacity_func_name(vector_type* const vec_ptr)
+size_t vector_capacity_func_name(vector_type* const vec_ptr)
 
 #define VECTOR_DECLARE_EMPTY_FUNC(vector_empty_func_name, vector_type) \
 bool vector_empty_func_name(vector_type* const vec_ptr)
 
 #define VECTOR_DECLARE_ASSIGN_FUNC(vector_assign_func_name, vector_type, element_type) \
-void vector_assign_func_name(vector_type* const vec_ptr, const element_type* const new_elements, const unsigned int new_size)
+void vector_assign_func_name(vector_type* const vec_ptr, const element_type* const new_elements, const size_t new_size)
 
 #define VECTOR_DECLARE_PUSH_BACK_FUNC(vector_push_back_func_name, vector_type, element_type) \
 void vector_push_back_func_name(vector_type* const vec_ptr, const element_type* const new_element)
@@ -121,10 +121,10 @@ void vector_push_back_func_name(vector_type* const vec_ptr, const element_type* 
 void vector_pop_back_func_name(vector_type* const vec_ptr)
 
 #define VECTOR_DECLARE_INSERT_FUNC(vector_insert_func_name, vector_type, element_type) \
-element_type* vector_insert_func_name(vector_type* const vec_ptr, const unsigned int position, const element_type* const new_element)
+element_type* vector_insert_func_name(vector_type* const vec_ptr, const size_t position, const element_type* const new_element)
 
 #define VECTOR_DECLARE_ERASE_FUNC(vector_erase_func_name, vector_type) \
-void vector_erase_func_name(vector_type* const vec_ptr, const unsigned int position)
+void vector_erase_func_name(vector_type* const vec_ptr, const size_t position)
 
 #define VECTOR_DECLARE_SWAP_FUNC(vector_swap_func_name, vector_type) \
 void vector_swap_func_name(vector_type* const vec_a_ptr, vector_type* const vec_b_ptr)
@@ -133,7 +133,7 @@ void vector_swap_func_name(vector_type* const vec_a_ptr, vector_type* const vec_
 void vector_clear_func_name(vector_type* const vec_ptr)
 
 #define VECTOR_DECLARE_EMPLACE_FUNC(vector_emplace_func_name, vector_type, element_type) \
-element_type* vector_emplace_func_name(vector_type* const vec_ptr, const unsigned int position, const bool fill_zeros)
+element_type* vector_emplace_func_name(vector_type* const vec_ptr, const size_t position, const bool fill_zeros)
 
 #define VECTOR_DECLARE_EMPLACE_BACK_FUNC(vector_emplace_back_func_name, vector_type, element_type) \
 element_type* vector_emplace_back_func_name(vector_type* const vec_ptr, const bool fill_zeros)
@@ -149,7 +149,7 @@ void vector_destruct_func_name(vector_type* const vec_ptr)
 
 // ----- Macros for defining functions -----
 
-#define VECTOR_DEFINE_CONSTRUCT_FUNC(vector_construct_func_name, vector_type) vector_type vector_construct_func_name(const unsigned int initial_capacity) { \
+#define VECTOR_DEFINE_CONSTRUCT_FUNC(vector_construct_func_name, vector_type) vector_type vector_construct_func_name(const size_t initial_capacity) { \
     vector_type vec = { \
         .elements = NULL, \
         .size = 0, \
@@ -166,7 +166,7 @@ void vector_destruct_func_name(vector_type* const vec_ptr)
 
 
 #define VECTOR_DEFINE_RESERVE_FUNC(vector_reserve_func_name, vector_type) \
-void vector_reserve_func_name(vector_type* const vec_ptr, const unsigned int new_capacity) { \
+void vector_reserve_func_name(vector_type* const vec_ptr, const size_t new_capacity) { \
     if (vec_ptr == NULL) { return; } \
     if (new_capacity <= vec_ptr->capacity) { return; } \
     typeof(vec_ptr->elements) reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(*(vec_ptr->elements))); \
@@ -178,9 +178,9 @@ void vector_reserve_func_name(vector_type* const vec_ptr, const unsigned int new
 
 
 #define VECTOR_DEFINE_RESIZE_FUNC(vector_resize_func_name, vector_type, element_type) \
-void vector_resize_func_name(vector_type* const vec_ptr, const unsigned int new_size, const element_type* const value_ptr) { \
+void vector_resize_func_name(vector_type* const vec_ptr, const size_t new_size, const element_type* const value_ptr) { \
     if (vec_ptr == NULL) { return; } \
-    const unsigned int old_size = vec_ptr->size; \
+    const size_t old_size = vec_ptr->size; \
     if (new_size == old_size) { return; } \
     else if (new_size < old_size) { \
         vec_ptr->size = new_size; \
@@ -192,13 +192,13 @@ void vector_resize_func_name(vector_type* const vec_ptr, const unsigned int new_
             memset(&(vec_ptr->elements[old_size]), 0, (new_size - old_size) * sizeof(element_type)); \
         } \
         else { \
-            for (unsigned int i = old_size; i < new_size; ++i) { \
+            for (size_t i = old_size; i < new_size; ++i) { \
                 memcpy(&(vec_ptr->elements[i]), value_ptr, sizeof(element_type)); \
             } \
         } \
     } \
     else { \
-        const unsigned int new_capacity = new_size; \
+        const size_t new_capacity = new_size; \
         element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
         if (reallocated_elements != NULL) { \
             vec_ptr->elements = reallocated_elements; \
@@ -208,7 +208,7 @@ void vector_resize_func_name(vector_type* const vec_ptr, const unsigned int new_
                 memset(&(vec_ptr->elements[old_size]), 0, (new_size - old_size) * sizeof(element_type)); \
             } \
             else { \
-                for (unsigned int i = old_size; i < new_size; ++i) { \
+                for (size_t i = old_size; i < new_size; ++i) { \
                     memcpy(&(vec_ptr->elements[i]), value_ptr, sizeof(element_type)); \
                 } \
             } \
@@ -220,7 +220,7 @@ void vector_resize_func_name(vector_type* const vec_ptr, const unsigned int new_
 #define VECTOR_DEFINE_SHRINK_TO_FIT_FUNC(vector_shrink_to_fit_func_name, vector_type) \
 void vector_shrink_to_fit_func_name(vector_type* const vec_ptr) { \
     if (vec_ptr == NULL) { return; } \
-    const unsigned int new_capacity = vec_ptr->size; \
+    const size_t new_capacity = vec_ptr->size; \
     if (new_capacity == 0) { \
         free(vec_ptr->elements); \
         vec_ptr->elements = NULL; \
@@ -237,7 +237,7 @@ void vector_shrink_to_fit_func_name(vector_type* const vec_ptr) { \
 
 
 #define VECTOR_DEFINE_AT_FUNC(vector_at_func_name, vector_type, element_type) \
-element_type* vector_at_func_name(vector_type* const vec_ptr, const unsigned int position) { \
+element_type* vector_at_func_name(vector_type* const vec_ptr, const size_t position) { \
     if (vec_ptr == NULL) { return NULL; } \
     if (vec_ptr->elements == NULL) { return NULL; } \
     if (position >= vec_ptr->size) { return NULL; } \
@@ -270,14 +270,14 @@ element_type* vector_data_func_name(vector_type* const vec_ptr) { \
 
 
 #define VECTOR_DEFINE_SIZE_FUNC(vector_size_func_name, vector_type) \
-unsigned int vector_size_func_name(vector_type* const vec_ptr) { \
+size_t vector_size_func_name(vector_type* const vec_ptr) { \
     if (vec_ptr == NULL) { return 0; } \
     return vec_ptr->size; \
 }
 
 
 #define VECTOR_DEFINE_CAPACITY_FUNC(vector_capacity_func_name, vector_type) \
-unsigned int vector_capacity_func_name(vector_type* const vec_ptr) { \
+size_t vector_capacity_func_name(vector_type* const vec_ptr) { \
     if (vec_ptr == NULL) { return 0; } \
     return vec_ptr->capacity; \
 }
@@ -291,9 +291,9 @@ bool vector_empty_func_name(vector_type* const vec_ptr) { \
 
 
 #define VECTOR_DEFINE_ASSIGN_FUNC(vector_assign_func_name, vector_type, element_type) \
-void vector_assign_func_name(vector_type* const vec_ptr, const element_type* const new_elements, const unsigned int new_size) { \
+void vector_assign_func_name(vector_type* const vec_ptr, const element_type* const new_elements, const size_t new_size) { \
     if (vec_ptr == NULL) { return; } \
-    const unsigned int old_size = vec_ptr->size; \
+    const size_t old_size = vec_ptr->size; \
     if (new_elements == NULL || new_size == 0) { \
         if (vec_ptr->elements != NULL && old_size > 0) { \
             memset(vec_ptr->elements, 0, old_size * sizeof(element_type)); \
@@ -339,7 +339,7 @@ void vector_push_back_func_name(vector_type* const vec_ptr, const element_type* 
         vec_ptr->size += 1; \
     } \
     else { \
-        const unsigned int new_capacity = 2 * vec_ptr->capacity; \
+        const size_t new_capacity = 2 * vec_ptr->capacity; \
         element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
         if (reallocated_elements != NULL) { \
             vec_ptr->elements = reallocated_elements; \
@@ -362,7 +362,7 @@ void vector_pop_back_func_name(vector_type* const vec_ptr) { \
 
 
 #define VECTOR_DEFINE_INSERT_FUNC(vector_insert_func_name, vector_type, element_type) \
-element_type* vector_insert_func_name(vector_type* const vec_ptr, const unsigned int position, const element_type* const new_element) { \
+element_type* vector_insert_func_name(vector_type* const vec_ptr, const size_t position, const element_type* const new_element) { \
     if (vec_ptr == NULL) { return NULL; } \
     if (new_element == NULL) { return NULL; } \
     if (position > vec_ptr->size) { return NULL; } \
@@ -385,7 +385,7 @@ element_type* vector_insert_func_name(vector_type* const vec_ptr, const unsigned
             return &(vec_ptr->elements[vec_ptr->size - 1]); \
         } \
         else { \
-            const unsigned int new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = 2 * vec_ptr->capacity; \
             element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
             if (reallocated_elements != NULL) { \
                 vec_ptr->elements = reallocated_elements; \
@@ -407,7 +407,7 @@ element_type* vector_insert_func_name(vector_type* const vec_ptr, const unsigned
             return &(vec_ptr->elements[position]); \
         } \
         else { \
-            const unsigned int new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = 2 * vec_ptr->capacity; \
             element_type* const reallocated_array = malloc(new_capacity * sizeof(element_type)); \
             if (reallocated_array != NULL) { \
                 if (position > 0) { \
@@ -432,7 +432,7 @@ element_type* vector_insert_func_name(vector_type* const vec_ptr, const unsigned
 
 
 #define VECTOR_DEFINE_ERASE_FUNC(vector_erase_func_name, vector_type) \
-void vector_erase_func_name(vector_type* const vec_ptr, const unsigned int position) { \
+void vector_erase_func_name(vector_type* const vec_ptr, const size_t position) { \
     if (vec_ptr == NULL) { return; } \
     if (position >= vec_ptr->size) { return; } \
     else if (position == (vec_ptr->size -1)) { \
@@ -468,7 +468,7 @@ void vector_clear_func_name(vector_type* const vec_ptr) { \
 
 
 #define VECTOR_DEFINE_EMPLACE_FUNC(vector_emplace_func_name, vector_type, element_type) \
-element_type* vector_emplace_func_name(vector_type* const vec_ptr, const unsigned int position, const bool fill_zeros) { \
+element_type* vector_emplace_func_name(vector_type* const vec_ptr, const size_t position, const bool fill_zeros) { \
     if (vec_ptr == NULL) { return NULL; } \
     if (position > vec_ptr->size) { return NULL; } \
     else if (position == vec_ptr->size) { \
@@ -490,7 +490,7 @@ element_type* vector_emplace_func_name(vector_type* const vec_ptr, const unsigne
             return &(vec_ptr->elements[vec_ptr->size - 1]); \
         } \
         else { \
-            const unsigned int new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = 2 * vec_ptr->capacity; \
             element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
             if (reallocated_elements != NULL) { \
                 vec_ptr->elements = reallocated_elements; \
@@ -512,7 +512,7 @@ element_type* vector_emplace_func_name(vector_type* const vec_ptr, const unsigne
             return &(vec_ptr->elements[position]); \
         } \
         else { \
-            const unsigned int new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = 2 * vec_ptr->capacity; \
             element_type* const reallocated_array = malloc(new_capacity * sizeof(element_type)); \
             if (reallocated_array != NULL) { \
                 if (position > 0) { \
@@ -557,7 +557,7 @@ element_type* vector_emplace_back_func_name(vector_type* const vec_ptr, const bo
         return &(vec_ptr->elements[vec_ptr->size-1]); \
     } \
     else { \
-        const unsigned int new_capacity = 2 * vec_ptr->capacity; \
+        const size_t new_capacity = 2 * vec_ptr->capacity; \
         element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
         if (reallocated_elements != NULL) { \
             vec_ptr->elements = reallocated_elements; \
@@ -595,11 +595,11 @@ typedef bool (*element_compare_func_type)(const element_type* const, const eleme
 
 
 #define VECTOR_DECLARE_SORT_FUNC(vector_quick_sort_func_name, vector_type, element_compare_func_type) \
-void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_func_type cmp_is_smaller, const unsigned int start, const unsigned int end)
+void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_func_type cmp_is_smaller, const size_t start, const size_t end)
 
 
 #define VECTOR_DEFINE_SORT_FUNC(vector_quick_sort_func_name, vector_type, element_compare_func_type) \
-void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_func_type cmp_is_smaller, const unsigned int start, const unsigned int end) { \
+void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_func_type cmp_is_smaller, const size_t start, const size_t end) { \
     if (vec_ptr == NULL) { return; } \
     if (vec_ptr->elements == NULL) { return; } \
     if (cmp_is_smaller == NULL) { return; } \
@@ -616,9 +616,9 @@ void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_fun
         } \
     } \
     else { \
-        unsigned int pivot = end; \
-        unsigned int right = end; \
-        unsigned int left = start-1; \
+        size_t pivot = end; \
+        size_t right = end; \
+        size_t left = start-1; \
         typeof(vec_ptr->elements) pivot_element = malloc(sizeof(*(vec_ptr->elements))); \
         if (pivot_element == NULL) { return; } \
         else { memcpy(pivot_element, &(vec_ptr->elements[pivot]), sizeof(*(vec_ptr->elements))); } \

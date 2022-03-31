@@ -42,7 +42,7 @@ VECTOR_DEFINE_FUNCTIONS(dc_vector_t, struct data_collection,
 // Define a function that prints all elements of a vector.
 void show_dc_vector(dc_vector_t* const dc_vec) {
 
-    printf("Size = %u, Capacity = %u: {", dc_vector_size(dc_vec), dc_vector_capacity(dc_vec));
+    printf("Size = %lu, Capacity = %lu: {", dc_vector_size(dc_vec), dc_vector_capacity(dc_vec));
 
     // We can use the FOREACH macro to iterate through the vector.
     VECTOR_FOREACH(dc_vec, element) {
