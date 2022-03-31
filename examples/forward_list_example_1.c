@@ -8,7 +8,7 @@ FORWARD_LIST_DEFINE_CONTAINER(float, fnode_struct, fnode_t, flist_struct, flist_
 
 // Define the common funtions for interacting the list.
 // We must specify what names these functions should get.
-FORWARD_LIST_DEFINE_FUNCTIONS(flist_t, float, 
+FORWARD_LIST_DEFINE_FUNCTIONS(flist_t, fnode_t, float, 
     flist_construct,
     flist_emty,
     flist_front,

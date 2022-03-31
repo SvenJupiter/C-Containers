@@ -14,7 +14,7 @@ FORWARD_LIST_DEFINE_CONTAINER(struct data_collection, dc_node_struct, dc_node_t,
 
 // Define the common funtions for interacting the list.
 // We must specify what names these functions should get.
-FORWARD_LIST_DEFINE_FUNCTIONS(dc_list_t, struct data_collection, 
+FORWARD_LIST_DEFINE_FUNCTIONS(dc_list_t, dc_node_t, struct data_collection, 
     dc_list_construct,
     dc_list_emty,
     dc_list_front,
@@ -101,7 +101,7 @@ bool dc_compare(const struct data_collection* const x ,const struct data_collect
 // Sorting an already existing list is not implemented yet.
 // But you can build a sorted sorted list by using the 'sorted_insert' function for your type of list.
 // Please note: The 'sorted_insert' function assumes, that the list is already sorted when trying to insert the new element.
-FORWARD_LIST_DEFINE_SORTED_INSERT_FUNC(dc_list_sorted_insert, dc_list_t, struct data_collection, cmp_dc_t);
+FORWARD_LIST_DEFINE_SORTED_INSERT_FUNC(dc_list_sorted_insert, dc_list_t, dc_node_t, struct data_collection, cmp_dc_t);
 
 void dc_list_test2_sorted_insert() {
 
