@@ -2,10 +2,12 @@
 #define SJ_VECTOR_CONTAINER_H
 
 #include <stddef.h> // NULL, size_t
+#include <stdint.h> // SIZE_MAX
 #include <stdbool.h> // bool
 #include <stdlib.h> // malloc, realloc, free
 #include <string.h> // memset, memcpy, memmove
 
+#define VECTOR_MAX_CAPACITY SIZE_MAX
 
 #define VECTOR_DEFINE_CONTAINER(element_type, struct_name, vector_type) \
 typedef struct struct_name { \
@@ -326,6 +328,7 @@ void vector_assign_func_name(vector_type* const vec_ptr, const element_type* con
 void vector_push_back_func_name(vector_type* const vec_ptr, const element_type* const new_element) { \
     if (vec_ptr == NULL) { return; } \
     if (new_element == NULL) { return; } \
+    if (vec_ptr->size == VECTOR_MAX_CAPACITY) { return; } \
     if (vec_ptr->capacity == 0) { \
         vec_ptr->elements = malloc(sizeof(element_type)); \
         if (vec_ptr->elements != NULL) { \
@@ -339,7 +342,7 @@ void vector_push_back_func_name(vector_type* const vec_ptr, const element_type* 
         vec_ptr->size += 1; \
     } \
     else { \
-        const size_t new_capacity = 2 * vec_ptr->capacity; \
+        const size_t new_capacity = (((VECTOR_MAX_CAPACITY / 2) < vec_ptr->capacity) ? VECTOR_MAX_CAPACITY : 2 * vec_ptr->capacity); \
         element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
         if (reallocated_elements != NULL) { \
             vec_ptr->elements = reallocated_elements; \
@@ -365,6 +368,7 @@ void vector_pop_back_func_name(vector_type* const vec_ptr) { \
 element_type* vector_insert_func_name(vector_type* const vec_ptr, const size_t position, const element_type* const new_element) { \
     if (vec_ptr == NULL) { return NULL; } \
     if (new_element == NULL) { return NULL; } \
+    if (vec_ptr->size == VECTOR_MAX_CAPACITY) { return NULL; } \
     if (position > vec_ptr->size) { return NULL; } \
     else if (position == vec_ptr->size) { \
         if (vec_ptr->capacity == 0) { \
@@ -385,7 +389,7 @@ element_type* vector_insert_func_name(vector_type* const vec_ptr, const size_t p
             return &(vec_ptr->elements[vec_ptr->size - 1]); \
         } \
         else { \
-            const size_t new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = (((VECTOR_MAX_CAPACITY / 2) < vec_ptr->capacity) ? VECTOR_MAX_CAPACITY : 2 * vec_ptr->capacity); \
             element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
             if (reallocated_elements != NULL) { \
                 vec_ptr->elements = reallocated_elements; \
@@ -407,7 +411,7 @@ element_type* vector_insert_func_name(vector_type* const vec_ptr, const size_t p
             return &(vec_ptr->elements[position]); \
         } \
         else { \
-            const size_t new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = (((VECTOR_MAX_CAPACITY / 2) < vec_ptr->capacity) ? VECTOR_MAX_CAPACITY : 2 * vec_ptr->capacity); \
             element_type* const reallocated_array = malloc(new_capacity * sizeof(element_type)); \
             if (reallocated_array != NULL) { \
                 if (position > 0) { \
@@ -470,6 +474,7 @@ void vector_clear_func_name(vector_type* const vec_ptr) { \
 #define VECTOR_DEFINE_EMPLACE_FUNC(vector_emplace_func_name, vector_type, element_type) \
 element_type* vector_emplace_func_name(vector_type* const vec_ptr, const size_t position, const bool fill_zeros) { \
     if (vec_ptr == NULL) { return NULL; } \
+    if (vec_ptr->size == VECTOR_MAX_CAPACITY) { return NULL; } \
     if (position > vec_ptr->size) { return NULL; } \
     else if (position == vec_ptr->size) { \
         if (vec_ptr->capacity == 0) { \
@@ -490,7 +495,7 @@ element_type* vector_emplace_func_name(vector_type* const vec_ptr, const size_t 
             return &(vec_ptr->elements[vec_ptr->size - 1]); \
         } \
         else { \
-            const size_t new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = (((VECTOR_MAX_CAPACITY / 2) < vec_ptr->capacity) ? VECTOR_MAX_CAPACITY : 2 * vec_ptr->capacity); \
             element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
             if (reallocated_elements != NULL) { \
                 vec_ptr->elements = reallocated_elements; \
@@ -512,7 +517,7 @@ element_type* vector_emplace_func_name(vector_type* const vec_ptr, const size_t 
             return &(vec_ptr->elements[position]); \
         } \
         else { \
-            const size_t new_capacity = 2 * vec_ptr->capacity; \
+            const size_t new_capacity = (((VECTOR_MAX_CAPACITY / 2) < vec_ptr->capacity) ? VECTOR_MAX_CAPACITY : 2 * vec_ptr->capacity); \
             element_type* const reallocated_array = malloc(new_capacity * sizeof(element_type)); \
             if (reallocated_array != NULL) { \
                 if (position > 0) { \
@@ -539,6 +544,7 @@ element_type* vector_emplace_func_name(vector_type* const vec_ptr, const size_t 
 #define VECTOR_DEFINE_EMPLACE_BACK_FUNC(vector_emplace_back_func_name, vector_type, element_type) \
 element_type* vector_emplace_back_func_name(vector_type* const vec_ptr, const bool fill_zeros) { \
     if (vec_ptr == NULL) { return NULL; } \
+    if (vec_ptr->size == VECTOR_MAX_CAPACITY) { return NULL; } \
     if (vec_ptr->capacity == 0) { \
         vec_ptr->elements = malloc(sizeof(element_type)); \
         if (vec_ptr->elements != NULL) { \
@@ -557,7 +563,7 @@ element_type* vector_emplace_back_func_name(vector_type* const vec_ptr, const bo
         return &(vec_ptr->elements[vec_ptr->size-1]); \
     } \
     else { \
-        const size_t new_capacity = 2 * vec_ptr->capacity; \
+        const size_t new_capacity = (((VECTOR_MAX_CAPACITY / 2) < vec_ptr->capacity) ? VECTOR_MAX_CAPACITY : 2 * vec_ptr->capacity); \
         element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
         if (reallocated_elements != NULL) { \
             vec_ptr->elements = reallocated_elements; \
