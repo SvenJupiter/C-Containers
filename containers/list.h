@@ -66,27 +66,27 @@ LIST_DECLARE_DESTRUCT_FUNC(list_destruct_func_name, list_type)
 
 // ----- Define common functions for the container -----
 
-#define LIST_DEFINE_FUNCTIONS(list_type, element_type, list_construct_func_name, list_empty_func_name, list_size_func_name, list_front_func_name, list_back_func_name, list_at_func_name, list_assign_func_name, list_emplace_front_func_name, list_push_front_func_name, list_pop_front_func_name, list_emplace_back_func_name, list_push_back_func_name, list_pop_back_func_name, list_emplace_func_name, list_insert_func_name, list_erase_func_name, list_swap_func_name, list_resize_func_name, list_clear_func_name, list_destruct_func_name) \
+#define LIST_DEFINE_FUNCTIONS(list_type, node_type, element_type, list_construct_func_name, list_empty_func_name, list_size_func_name, list_front_func_name, list_back_func_name, list_at_func_name, list_assign_func_name, list_emplace_front_func_name, list_push_front_func_name, list_pop_front_func_name, list_emplace_back_func_name, list_push_back_func_name, list_pop_back_func_name, list_emplace_func_name, list_insert_func_name, list_erase_func_name, list_swap_func_name, list_resize_func_name, list_clear_func_name, list_destruct_func_name) \
 LIST_DEFINE_CONSTRUCT_FUNC(list_construct_func_name, list_type); \
 LIST_DEFINE_EMPTY_FUNC(list_empty_func_name, list_type); \
 LIST_DEFINE_SIZE_FUNC(list_size_func_name, list_type); \
 LIST_DEFINE_FRONT_FUNC(list_front_func_name, list_type, element_type); \
 LIST_DEFINE_BACK_FUNC(list_back_func_name, list_type, element_type); \
-LIST_DEFINE_AT_FUNC(list_at_func_name, list_type, element_type); \
-LIST_DEFINE_ASSIGN_FUNC(list_assign_func_name, list_type, element_type); \
-LIST_DEFINE_EMPLACE_FRONT_FUNC(list_emplace_front_func_name, list_type, element_type); \
-LIST_DEFINE_PUSH_FRONT_FUNC(list_push_front_func_name, list_type, element_type); \
-LIST_DEFINE_POP_FRONT_FUNC(list_pop_front_func_name, list_type); \
-LIST_DEFINE_EMPLACE_BACK_FUNC(list_emplace_back_func_name, list_type, element_type); \
-LIST_DEFINE_PUSH_BACK_FUNC(list_push_back_func_name, list_type, element_type); \
-LIST_DEFINE_POP_BACK_FUNC(list_pop_back_func_name, list_type); \
-LIST_DEFINE_EMPLACE_FUNC(list_emplace_func_name, list_type, element_type); \
-LIST_DEFINE_INSERT_FUNC(list_insert_func_name, list_type, element_type); \
-LIST_DEFINE_ERASE_FUNC(list_erase_func_name, list_type); \
+LIST_DEFINE_AT_FUNC(list_at_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_ASSIGN_FUNC(list_assign_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_EMPLACE_FRONT_FUNC(list_emplace_front_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_PUSH_FRONT_FUNC(list_push_front_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_POP_FRONT_FUNC(list_pop_front_func_name, list_type, node_type); \
+LIST_DEFINE_EMPLACE_BACK_FUNC(list_emplace_back_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_PUSH_BACK_FUNC(list_push_back_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_POP_BACK_FUNC(list_pop_back_func_name, list_type, node_type); \
+LIST_DEFINE_EMPLACE_FUNC(list_emplace_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_INSERT_FUNC(list_insert_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_ERASE_FUNC(list_erase_func_name, list_type, node_type); \
 LIST_DEFINE_SWAP_FUNC(list_swap_func_name, list_type); \
-LIST_DEFINE_RESIZE_FUNC(list_resize_func_name, list_type, element_type); \
-LIST_DEFINE_CLEAR_FUNC(list_clear_func_name, list_type); \
-LIST_DEFINE_DESTRUCT_FUNC(list_destruct_func_name, list_type)
+LIST_DEFINE_RESIZE_FUNC(list_resize_func_name, list_type, node_type, element_type); \
+LIST_DEFINE_CLEAR_FUNC(list_clear_func_name, list_type, node_type); \
+LIST_DEFINE_DESTRUCT_FUNC(list_destruct_func_name, list_type, node_type)
 
 
 
@@ -189,20 +189,20 @@ element_type* list_back_func_name(list_type* const list_ptr) { \
     return &(list_ptr->back->element); \
 }
 
-#define LIST_DEFINE_AT_FUNC(list_at_func_name, list_type, element_type) \
+#define LIST_DEFINE_AT_FUNC(list_at_func_name, list_type, node_type, element_type) \
 element_type* list_at_func_name(list_type* const list_ptr, const size_t position) { \
     if (list_ptr == NULL) { return NULL; } \
     if (position >= list_ptr->size) { return NULL; } \
  \
     if(position < (list_ptr->size / 2u)) { \
-        __auto_type node = list_ptr->front; \
+        node_type* node = list_ptr->front; \
         for (size_t count = 0; count < position; ++count) { \
             node = node->next; \
         } \
         return &(node->element); \
     } \
     else { \
-        __auto_type node = list_ptr->back; \
+        node_type* node = list_ptr->back; \
         for (size_t count = list_ptr->size-1; count > position; --count) { \
             node = node->prev; \
         } \
@@ -210,19 +210,19 @@ element_type* list_at_func_name(list_type* const list_ptr, const size_t position
     } \
 }
 
-#define LIST_DEFINE_ASSIGN_FUNC(list_assign_func_name, list_type, element_type) \
+#define LIST_DEFINE_ASSIGN_FUNC(list_assign_func_name, list_type, node_type, element_type) \
 void list_assign_func_name(list_type* const list_ptr, const element_type* const new_elements, const size_t new_size) { \
     if (list_ptr == NULL) { return; } \
  \
-    typeof(list_ptr->front) next_node; \
-    for (__auto_type node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
+    node_type* next_node; \
+    for (node_type* node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
     list_ptr->front = NULL; \
     list_ptr->back = NULL; \
     list_ptr->size = 0; \
  \
     if(new_elements != NULL && new_size != 0) { \
  \
-        typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
         if (new_node == NULL) { list_ptr->size = 0; return; } \
         new_node->prev = NULL; \
         new_node->next = NULL; \
@@ -244,11 +244,11 @@ void list_assign_func_name(list_type* const list_ptr, const element_type* const 
     } \
 }
 
-#define LIST_DEFINE_EMPLACE_FRONT_FUNC(list_emplace_front_func_name, list_type, element_type) \
+#define LIST_DEFINE_EMPLACE_FRONT_FUNC(list_emplace_front_func_name, list_type, node_type, element_type) \
 element_type* list_emplace_front_func_name(list_type* const list_ptr, const bool fill_zeros) { \
     if (list_ptr == NULL) { return NULL; } \
  \
-    typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+    node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
     if (new_node == NULL) { return NULL; } \
     new_node->prev = NULL; \
     new_node->next = list_ptr->front; \
@@ -268,12 +268,12 @@ element_type* list_emplace_front_func_name(list_type* const list_ptr, const bool
     } \
 }
 
-#define LIST_DEFINE_PUSH_FRONT_FUNC(list_push_front_func_name, list_type, element_type) \
+#define LIST_DEFINE_PUSH_FRONT_FUNC(list_push_front_func_name, list_type, node_type, element_type) \
 element_type* list_push_front_func_name(list_type* const list_ptr, const element_type* const new_element) { \
     if (list_ptr == NULL) { return NULL; } \
     if (new_element == NULL) { return NULL; } \
  \
-    typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+    node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
     if (new_node == NULL) { return NULL; } \
     new_node->prev = NULL; \
     new_node->next = list_ptr->front; \
@@ -293,7 +293,7 @@ element_type* list_push_front_func_name(list_type* const list_ptr, const element
     } \
 }
 
-#define LIST_DEFINE_POP_FRONT_FUNC(list_pop_front_func_name, list_type) \
+#define LIST_DEFINE_POP_FRONT_FUNC(list_pop_front_func_name, list_type, node_type) \
 void list_pop_front_func_name(list_type* const list_ptr) { \
     if (list_ptr == NULL) { return; } \
     if (list_ptr->size == 0) { return; } \
@@ -304,7 +304,7 @@ void list_pop_front_func_name(list_type* const list_ptr) { \
         list_ptr->size = 0; \
     } \
     else { \
-        __auto_type old_node = list_ptr->front; \
+        node_type* old_node = list_ptr->front; \
         list_ptr->front = list_ptr->front->next; \
         list_ptr->front->prev = NULL; \
         list_ptr->size -= 1; \
@@ -312,11 +312,11 @@ void list_pop_front_func_name(list_type* const list_ptr) { \
     } \
 }
 
-#define LIST_DEFINE_EMPLACE_BACK_FUNC(list_emplace_back_func_name, list_type, element_type) \
+#define LIST_DEFINE_EMPLACE_BACK_FUNC(list_emplace_back_func_name, list_type, node_type, element_type) \
 element_type* list_emplace_back_func_name(list_type* const list_ptr, const bool fill_zeros) { \
     if (list_ptr == NULL) { return NULL; } \
  \
-    typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+    node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
     if (new_node == NULL) { return NULL; } \
     new_node->next = NULL; \
     new_node->prev = list_ptr->back; \
@@ -336,12 +336,12 @@ element_type* list_emplace_back_func_name(list_type* const list_ptr, const bool 
     } \
 }
 
-#define LIST_DEFINE_PUSH_BACK_FUNC(list_push_back_func_name, list_type, element_type) \
+#define LIST_DEFINE_PUSH_BACK_FUNC(list_push_back_func_name, list_type, node_type, element_type) \
 element_type* list_push_back_func_name(list_type* const list_ptr, const element_type* const new_element) { \
     if (list_ptr == NULL) { return NULL; } \
     if (new_element == NULL) { return NULL; } \
  \
-    typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+    node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
     if (new_node == NULL) { return NULL; } \
     new_node->next = NULL; \
     new_node->prev = list_ptr->back; \
@@ -361,7 +361,7 @@ element_type* list_push_back_func_name(list_type* const list_ptr, const element_
     } \
 }
 
-#define LIST_DEFINE_POP_BACK_FUNC(list_pop_back_func_name, list_type) \
+#define LIST_DEFINE_POP_BACK_FUNC(list_pop_back_func_name, list_type, node_type) \
 void list_pop_back_func_name(list_type* const list_ptr) { \
     if (list_ptr == NULL) { return; } \
     if (list_ptr->size == 0) { return; } \
@@ -372,7 +372,7 @@ void list_pop_back_func_name(list_type* const list_ptr) { \
         list_ptr->size = 0; \
     } \
     else { \
-        __auto_type old_node = list_ptr->back; \
+        node_type* old_node = list_ptr->back; \
         list_ptr->back = list_ptr->back->prev; \
         list_ptr->back->next = NULL; \
         list_ptr->size -= 1; \
@@ -380,13 +380,13 @@ void list_pop_back_func_name(list_type* const list_ptr) { \
     } \
 }
 
-#define LIST_DEFINE_EMPLACE_FUNC(list_emplace_func_name, list_type, element_type) \
+#define LIST_DEFINE_EMPLACE_FUNC(list_emplace_func_name, list_type, node_type, element_type) \
 element_type* list_emplace_func_name(list_type* const list_ptr, const size_t position, const bool fill_zeros) { \
     if (list_ptr == NULL) { return NULL; } \
     if (position > list_ptr->size) { return NULL; } \
  \
     if (position == 0) { \
-        typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
         if (new_node == NULL) { return NULL; } \
         new_node->prev = NULL; \
         new_node->next = list_ptr->front; \
@@ -406,7 +406,7 @@ element_type* list_emplace_func_name(list_type* const list_ptr, const size_t pos
         } \
     } \
     else if (position == list_ptr->size) { \
-        typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
         if (new_node == NULL) { return NULL; } \
         new_node->next = NULL; \
         new_node->prev = list_ptr->back; \
@@ -426,7 +426,7 @@ element_type* list_emplace_func_name(list_type* const list_ptr, const size_t pos
         } \
     } \
     else { \
-        typeof(list_ptr->front) current_node;  \
+        node_type* current_node;  \
         if(position < (list_ptr->size / 2u)) { \
             current_node = list_ptr->front; \
             for (size_t count = 0; count < position; ++count) { \
@@ -440,7 +440,7 @@ element_type* list_emplace_func_name(list_type* const list_ptr, const size_t pos
             } \
         } \
  \
-        typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
         if (new_node == NULL) { return NULL; } \
         new_node->next = current_node; \
         new_node->prev = current_node->prev; \
@@ -452,14 +452,14 @@ element_type* list_emplace_func_name(list_type* const list_ptr, const size_t pos
     } \
 }
 
-#define LIST_DEFINE_INSERT_FUNC(list_insert_func_name, list_type, element_type) \
+#define LIST_DEFINE_INSERT_FUNC(list_insert_func_name, list_type, node_type, element_type) \
 element_type* list_insert_func_name(list_type* const list_ptr, const size_t position, const element_type* const new_element) { \
     if (list_ptr == NULL) { return NULL; } \
     if (new_element == NULL) { return NULL; } \
     if (position > list_ptr->size) { return NULL; } \
  \
     if (position == 0) { \
-        typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
         if (new_node == NULL) { return NULL; } \
         new_node->prev = NULL; \
         new_node->next = list_ptr->front; \
@@ -479,7 +479,7 @@ element_type* list_insert_func_name(list_type* const list_ptr, const size_t posi
         } \
     } \
     else if (position == list_ptr->size) { \
-        typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
         if (new_node == NULL) { return NULL; } \
         new_node->next = NULL; \
         new_node->prev = list_ptr->back; \
@@ -499,7 +499,7 @@ element_type* list_insert_func_name(list_type* const list_ptr, const size_t posi
         } \
     } \
     else { \
-        typeof(list_ptr->front) current_node;  \
+        node_type* current_node;  \
         if(position < (list_ptr->size / 2u)) { \
             current_node = list_ptr->front; \
             for (size_t count = 0; count < position; ++count) { \
@@ -513,7 +513,7 @@ element_type* list_insert_func_name(list_type* const list_ptr, const size_t posi
             } \
         } \
  \
-        typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
         if (new_node == NULL) { return NULL; } \
         new_node->next = current_node; \
         new_node->prev = current_node->prev; \
@@ -525,7 +525,7 @@ element_type* list_insert_func_name(list_type* const list_ptr, const size_t posi
     } \
 }
 
-#define LIST_DEFINE_ERASE_FUNC(list_erase_func_name, list_type) \
+#define LIST_DEFINE_ERASE_FUNC(list_erase_func_name, list_type, node_type) \
 void list_erase_func_name(list_type* const list_ptr, const size_t position) { \
     if (list_ptr == NULL) { return; } \
     if (position >= list_ptr->size) { return; } \
@@ -538,7 +538,7 @@ void list_erase_func_name(list_type* const list_ptr, const size_t position) { \
             list_ptr->size = 0; \
         } \
         else { \
-            __auto_type old_node = list_ptr->front; \
+            node_type* old_node = list_ptr->front; \
             list_ptr->front = list_ptr->front->next; \
             list_ptr->front->prev = NULL; \
             list_ptr->size -= 1; \
@@ -553,7 +553,7 @@ void list_erase_func_name(list_type* const list_ptr, const size_t position) { \
             list_ptr->size = 0; \
         } \
         else { \
-            __auto_type old_node = list_ptr->back; \
+            node_type* old_node = list_ptr->back; \
             list_ptr->back = list_ptr->back->prev; \
             list_ptr->back->next = NULL; \
             list_ptr->size -= 1; \
@@ -562,7 +562,7 @@ void list_erase_func_name(list_type* const list_ptr, const size_t position) { \
     } \
     else { \
  \
-        typeof(list_ptr->front) old_node;  \
+        node_type* old_node;  \
         if(position < (list_ptr->size / 2u)) { \
             old_node = list_ptr->front; \
             for (size_t count = 0; count < position; ++count) { \
@@ -593,20 +593,20 @@ void list_swap_func_name(list_type* const list_a_ptr, list_type* const list_b_pt
     *list_b_ptr = temp; \
 }
 
-#define LIST_DEFINE_RESIZE_FUNC(list_resize_func_name, list_type, element_type) \
+#define LIST_DEFINE_RESIZE_FUNC(list_resize_func_name, list_type, node_type, element_type) \
 void list_resize_func_name(list_type* const list_ptr, const size_t new_size, const element_type* const value_ptr) { \
     if (list_ptr == NULL) { return; } \
     const size_t old_size = list_ptr->size; \
  \
     if (new_size == 0) { \
-        typeof(list_ptr->front) next_node; \
-        for (__auto_type node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
+        node_type* next_node; \
+        for (node_type* node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
         list_ptr->front = NULL; \
         list_ptr->back = NULL; \
         list_ptr->size = 0; \
     } \
     else if (new_size < old_size) { \
-        typeof(list_ptr->back) old_node; \
+        node_type* old_node; \
         for (size_t count = old_size; count > new_size; --count) { \
             old_node = list_ptr->back; \
             list_ptr->back = list_ptr->back->prev; \
@@ -617,7 +617,7 @@ void list_resize_func_name(list_type* const list_ptr, const size_t new_size, con
     } \
     else if (new_size > old_size) { \
  \
-        typeof(list_ptr->back) new_node; \
+        node_type* new_node; \
         for (size_t count = old_size; count < new_size; ++count) { \
  \
             new_node = malloc(sizeof(*(list_ptr->back))); \
@@ -640,22 +640,22 @@ void list_resize_func_name(list_type* const list_ptr, const size_t new_size, con
     } \
 }
 
-#define LIST_DEFINE_CLEAR_FUNC(list_clear_func_name, list_type) \
+#define LIST_DEFINE_CLEAR_FUNC(list_clear_func_name, list_type, node_type) \
 void list_clear_func_name(list_type* const list_ptr) { \
     if (list_ptr == NULL) { return; } \
-    typeof(list_ptr->front) next_node; \
-    for (__auto_type node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
+    node_type* next_node; \
+    for (node_type* node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
     list_ptr->front = NULL; \
     list_ptr->back = NULL; \
     list_ptr->size = 0; \
 }
 
 
-#define LIST_DEFINE_DESTRUCT_FUNC(list_destruct_func_name, list_type) \
+#define LIST_DEFINE_DESTRUCT_FUNC(list_destruct_func_name, list_type, node_type) \
 void list_destruct_func_name(list_type* const list_ptr) { \
     if (list_ptr == NULL) { return; } \
-    typeof(list_ptr->front) next_node; \
-    for (__auto_type node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
+    node_type* next_node; \
+    for (node_type* node = list_ptr->front; node != NULL; node = next_node) { next_node = node->next; free(node); } \
     list_ptr->front = NULL; \
     list_ptr->back = NULL; \
     list_ptr->size = 0; \
@@ -685,13 +685,13 @@ element_type* list_sorted_insert_func_name(list_type* const list_ptr, element_co
 
 
 
-#define LIST_DEFINE_SORTED_EMPLACE_FUNC(list_sorted_emplace_func_name, list_type, element_type, element_ctx_compare_func_type) \
+#define LIST_DEFINE_SORTED_EMPLACE_FUNC(list_sorted_emplace_func_name, list_type, node_type, element_type, element_ctx_compare_func_type) \
 element_type* list_sorted_emplace_func_name(list_type* const list_ptr, element_ctx_compare_func_type cmp_is_smaller, const element_ctx_type* const ctx, const bool fill_zeros) { \
     if (list_ptr == NULL) { return NULL; } \
     if (cmp_is_smaller == NULL) { return NULL; } \
  \
     if (list_ptr->size == 0) { \
-        typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
         if (new_node == NULL) { return NULL; } \
         new_node->prev = NULL; \
         new_node->next = NULL; \
@@ -702,7 +702,7 @@ element_type* list_sorted_emplace_func_name(list_type* const list_ptr, element_c
         return &(new_node->element); \
     } \
     else if (cmp_is_smaller(ctx, &(list_ptr->front->element))) { \
-        typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
         if (new_node == NULL) { return NULL; } \
         new_node->prev = NULL; \
         new_node->next = list_ptr->front; \
@@ -713,14 +713,14 @@ element_type* list_sorted_emplace_func_name(list_type* const list_ptr, element_c
         return &(new_node->element); \
     } \
     else { \
-        __auto_type current_node = list_ptr->front->next; \
+        node_type* current_node = list_ptr->front->next; \
         while (current_node != NULL) {  \
             if (cmp_is_smaller(ctx, &(current_node->element))) { break; } \
             else { current_node = current_node->next; } \
         } \
  \
         if (current_node != NULL) { \
-            typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->back))); \
+            node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
             if (new_node == NULL) { return NULL; } \
             new_node->next = current_node; \
             new_node->prev = current_node->prev; \
@@ -731,7 +731,7 @@ element_type* list_sorted_emplace_func_name(list_type* const list_ptr, element_c
             return &(new_node->element); \
         } \
         else { \
-            typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+            node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
             if (new_node == NULL) { return NULL; } \
             new_node->next = NULL; \
             new_node->prev = list_ptr->back; \
@@ -744,14 +744,14 @@ element_type* list_sorted_emplace_func_name(list_type* const list_ptr, element_c
     } \
 }
 
-#define LIST_DEFINE_SORTED_INSERT_FUNC(list_sorted_insert_func_name, list_type, element_type, element_compare_func_type) \
+#define LIST_DEFINE_SORTED_INSERT_FUNC(list_sorted_insert_func_name, list_type, node_type, element_type, element_compare_func_type) \
 element_type* list_sorted_insert_func_name(list_type* const list_ptr, element_compare_func_type cmp_is_smaller, const element_type* const new_element) { \
     if (list_ptr == NULL) { return NULL; } \
     if (new_element == NULL) { return NULL; } \
     if (cmp_is_smaller == NULL) { return NULL; } \
  \
     if (list_ptr->size == 0) { \
-        typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
         if (new_node == NULL) { return NULL; } \
         new_node->prev = NULL; \
         new_node->next = NULL; \
@@ -762,7 +762,7 @@ element_type* list_sorted_insert_func_name(list_type* const list_ptr, element_co
         return &(new_node->element); \
     } \
     else if (cmp_is_smaller(new_element, &(list_ptr->front->element))) { \
-        typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->front))); \
+        node_type* new_node = malloc(sizeof(*(list_ptr->front))); \
         if (new_node == NULL) { return NULL; } \
         new_node->prev = NULL; \
         new_node->next = list_ptr->front; \
@@ -773,14 +773,14 @@ element_type* list_sorted_insert_func_name(list_type* const list_ptr, element_co
         return &(new_node->element); \
     } \
     else { \
-        __auto_type current_node = list_ptr->front->next; \
+        node_type* current_node = list_ptr->front->next; \
         while (current_node != NULL) {  \
             if (cmp_is_smaller(new_element, &(current_node->element))) { break; } \
             else { current_node = current_node->next; } \
         } \
  \
         if (current_node != NULL) { \
-            typeof(list_ptr->front) new_node = malloc(sizeof(*(list_ptr->back))); \
+            node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
             if (new_node == NULL) { return NULL; } \
             new_node->next = current_node; \
             new_node->prev = current_node->prev; \
@@ -791,7 +791,7 @@ element_type* list_sorted_insert_func_name(list_type* const list_ptr, element_co
             return &(new_node->element); \
         } \
         else { \
-            typeof(list_ptr->back) new_node = malloc(sizeof(*(list_ptr->back))); \
+            node_type* new_node = malloc(sizeof(*(list_ptr->back))); \
             if (new_node == NULL) { return NULL; } \
             new_node->next = NULL; \
             new_node->prev = list_ptr->back; \

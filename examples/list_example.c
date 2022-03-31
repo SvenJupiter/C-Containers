@@ -8,7 +8,7 @@ LIST_DEFINE_CONTAINER(double, dnode_struct, dnode_t, dlist_struct, dlist_t);
 
 // Define the common funtions for interacting the list.
 // We must specify what names these functions should get.
-LIST_DEFINE_FUNCTIONS(dlist_t, double, 
+LIST_DEFINE_FUNCTIONS(dlist_t, dnode_t, double, 
     dlist_construct,
     dlist_empty,
     dlist_size,
