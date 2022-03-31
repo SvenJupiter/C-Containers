@@ -74,7 +74,7 @@ bool dc_compare(const struct data_collection* const x, const struct data_collect
 
 // Define the sorting function for the vector.
 // The elements will be sorted with the Quick-Sort algorithm.
-VECTOR_DEFINE_SORT_FUNC(dc_vector_sort, dc_vector_t, dc_cmp_func_t);
+VECTOR_DEFINE_SORT_FUNC(dc_vector_sort, dc_vector_t, struct data_collection, dc_cmp_func_t);
 
 
 

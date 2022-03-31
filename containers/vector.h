@@ -53,9 +53,9 @@ VECTOR_DECLARE_DESTRUCT_FUNC(vector_destruct_func_name, vector_type)
 
 #define VECTOR_DEFINE_FUNCTIONS(vector_type, element_type, vector_construct_func_name, vector_reserve_func_name, vector_resize_func_name, vector_shrink_to_fit_func_name, vector_at_func_name, vector_front_func_name, vector_back_func_name, vector_data_func_name, vector_size_func_name, vector_capacity_func_name, vector_empty_func_name, vector_assign_func_name, vector_push_back_func_name, vector_pop_back_func_name, vector_insert_func_name, vector_erase_func_name, vector_swap_func_name, vector_clear_func_name, vector_emplace_func_name, vector_emplace_back_func_name, vector_destruct_func_name) \
 VECTOR_DEFINE_CONSTRUCT_FUNC(vector_construct_func_name, vector_type); \
-VECTOR_DEFINE_RESERVE_FUNC(vector_reserve_func_name, vector_type); \
+VECTOR_DEFINE_RESERVE_FUNC(vector_reserve_func_name, vector_type, element_type); \
 VECTOR_DEFINE_RESIZE_FUNC(vector_resize_func_name, vector_type, element_type); \
-VECTOR_DEFINE_SHRINK_TO_FIT_FUNC(vector_shrink_to_fit_func_name, vector_type); \
+VECTOR_DEFINE_SHRINK_TO_FIT_FUNC(vector_shrink_to_fit_func_name, vector_type, element_type); \
 VECTOR_DEFINE_AT_FUNC(vector_at_func_name, vector_type, element_type); \
 VECTOR_DEFINE_FRONT_FUNC(vector_front_func_name, vector_type, element_type); \
 VECTOR_DEFINE_BACK_FUNC(vector_back_func_name, vector_type, element_type); \
@@ -167,11 +167,11 @@ void vector_destruct_func_name(vector_type* const vec_ptr)
 }
 
 
-#define VECTOR_DEFINE_RESERVE_FUNC(vector_reserve_func_name, vector_type) \
+#define VECTOR_DEFINE_RESERVE_FUNC(vector_reserve_func_name, vector_type, element_type) \
 void vector_reserve_func_name(vector_type* const vec_ptr, const size_t new_capacity) { \
     if (vec_ptr == NULL) { return; } \
     if (new_capacity <= vec_ptr->capacity) { return; } \
-    typeof(vec_ptr->elements) reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(*(vec_ptr->elements))); \
+    element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(*(vec_ptr->elements))); \
     if (reallocated_elements != NULL) { \
         vec_ptr->elements = reallocated_elements; \
         vec_ptr->capacity = new_capacity; \
@@ -219,7 +219,7 @@ void vector_resize_func_name(vector_type* const vec_ptr, const size_t new_size, 
 }
 
 
-#define VECTOR_DEFINE_SHRINK_TO_FIT_FUNC(vector_shrink_to_fit_func_name, vector_type) \
+#define VECTOR_DEFINE_SHRINK_TO_FIT_FUNC(vector_shrink_to_fit_func_name, vector_type, element_type) \
 void vector_shrink_to_fit_func_name(vector_type* const vec_ptr) { \
     if (vec_ptr == NULL) { return; } \
     const size_t new_capacity = vec_ptr->size; \
@@ -229,7 +229,7 @@ void vector_shrink_to_fit_func_name(vector_type* const vec_ptr) { \
         vec_ptr->capacity = 0; \
     } \
     else { \
-        typeof(vec_ptr->elements) const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(*(vec_ptr->elements))); \
+        element_type* const reallocated_elements = realloc(vec_ptr->elements, new_capacity * sizeof(*(vec_ptr->elements))); \
         if (reallocated_elements != NULL) { \
             vec_ptr->elements = reallocated_elements; \
             vec_ptr->capacity = new_capacity; \
@@ -604,7 +604,7 @@ typedef bool (*element_compare_func_type)(const element_type* const, const eleme
 void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_func_type cmp_is_smaller, const size_t start, const size_t end)
 
 
-#define VECTOR_DEFINE_SORT_FUNC(vector_quick_sort_func_name, vector_type, element_compare_func_type) \
+#define VECTOR_DEFINE_SORT_FUNC(vector_quick_sort_func_name, vector_type, element_type, element_compare_func_type) \
 void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_func_type cmp_is_smaller, const size_t start, const size_t end) { \
     if (vec_ptr == NULL) { return; } \
     if (vec_ptr->elements == NULL) { return; } \
@@ -613,7 +613,7 @@ void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_fun
     if (start >= end) { return; } \
     else if ((end - start + 1) == 2) { \
         if (cmp_is_smaller(&(vec_ptr->elements[end]), &(vec_ptr->elements[start]))) { \
-            typeof(vec_ptr->elements) temp = malloc(sizeof(*(vec_ptr->elements))); \
+            element_type* const temp = malloc(sizeof(*(vec_ptr->elements))); \
             if (temp == NULL) { return; } \
             memcpy(temp, &(vec_ptr->elements[end]), sizeof(*(vec_ptr->elements))); \
             memcpy(&(vec_ptr->elements[end]), &(vec_ptr->elements[start]), sizeof(*(vec_ptr->elements))); \
@@ -625,7 +625,7 @@ void vector_quick_sort_func_name(vector_type* const vec_ptr, element_compare_fun
         size_t pivot = end; \
         size_t right = end; \
         size_t left = start-1; \
-        typeof(vec_ptr->elements) pivot_element = malloc(sizeof(*(vec_ptr->elements))); \
+        element_type* const pivot_element = malloc(sizeof(*(vec_ptr->elements))); \
         if (pivot_element == NULL) { return; } \
         else { memcpy(pivot_element, &(vec_ptr->elements[pivot]), sizeof(*(vec_ptr->elements))); } \
         while (left+1 < right) { \
