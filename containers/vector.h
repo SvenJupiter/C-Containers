@@ -9,6 +9,8 @@
 
 #define VECTOR_MAX_CAPACITY SIZE_MAX
 
+// ----- Define the structs used by the container -----
+
 #define VECTOR_DEFINE_CONTAINER(element_type, struct_name, vector_type) \
 typedef struct struct_name { \
     element_type* elements; \
@@ -65,9 +67,9 @@ VECTOR_DEFINE_CAPACITY_FUNC(vector_capacity_func_name, vector_type); \
 VECTOR_DEFINE_EMPTY_FUNC(vector_empty_func_name, vector_type); \
 VECTOR_DEFINE_ASSIGN_FUNC(vector_assign_func_name, vector_type, element_type); \
 VECTOR_DEFINE_PUSH_BACK_FUNC(vector_push_back_func_name, vector_type, element_type); \
-VECTOR_DEFINE_POP_BACK_FUNC(vector_pop_back_func_name, vector_type); \
+VECTOR_DEFINE_POP_BACK_FUNC(vector_pop_back_func_name, vector_type, element_type); \
 VECTOR_DEFINE_INSERT_FUNC(vector_insert_func_name, vector_type, element_type); \
-VECTOR_DEFINE_ERASE_FUNC(vector_erase_func_name, vector_type); \
+VECTOR_DEFINE_ERASE_FUNC(vector_erase_func_name, vector_type, element_type); \
 VECTOR_DEFINE_SWAP_FUNC(vector_swap_func_name, vector_type); \
 VECTOR_DEFINE_CLEAR_FUNC(vector_clear_func_name, vector_type); \
 VECTOR_DEFINE_EMPLACE_FUNC(vector_emplace_func_name, vector_type, element_type); \
@@ -354,12 +356,34 @@ void vector_push_back_func_name(vector_type* const vec_ptr, const element_type* 
 }
 
 
-#define VECTOR_DEFINE_POP_BACK_FUNC(vector_pop_back_func_name, vector_type) \
+#define VECTOR_DEFINE_POP_BACK_FUNC(vector_pop_back_func_name, vector_type, element_type) \
 void vector_pop_back_func_name(vector_type* const vec_ptr) { \
     if (vec_ptr == NULL) { return; } \
     if (vec_ptr->size > 0) { \
-        memset(&(vec_ptr->elements[vec_ptr->size - 1]), 0, sizeof(*(vec_ptr->elements))); \
-        vec_ptr->size -= 1; \
+        if (vec_ptr->capacity <= 4) { \
+            memset(&(vec_ptr->elements[vec_ptr->size - 1]), 0, sizeof(element_type)); \
+            vec_ptr->size -= 1; \
+        } \
+        else { \
+            const size_t new_size = vec_ptr->size - 1; \
+            const size_t new_capacity = vec_ptr->capacity / 2; \
+            if (new_capacity > new_size) { \
+                element_type* const new_array = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
+                if (new_array != NULL) { \
+                    vec_ptr->elements = new_array; \
+                    vec_ptr->size = new_size; \
+                    vec_ptr->capacity = new_capacity; \
+                } \
+                else { \
+                    memset(&(vec_ptr->elements[vec_ptr->size - 1]), 0, sizeof(element_type)); \
+                    vec_ptr->size -= 1; \
+                } \
+            } \
+            else { \
+                memset(&(vec_ptr->elements[vec_ptr->size - 1]), 0, sizeof(element_type)); \
+                vec_ptr->size -= 1; \
+            } \
+        } \
     } \
 }
 
@@ -435,18 +459,60 @@ element_type* vector_insert_func_name(vector_type* const vec_ptr, const size_t p
 }
 
 
-#define VECTOR_DEFINE_ERASE_FUNC(vector_erase_func_name, vector_type) \
+#define VECTOR_DEFINE_ERASE_FUNC(vector_erase_func_name, vector_type, element_type) \
 void vector_erase_func_name(vector_type* const vec_ptr, const size_t position) { \
     if (vec_ptr == NULL) { return; } \
     if (position >= vec_ptr->size) { return; } \
     else if (position == (vec_ptr->size -1)) { \
-        memset(&(vec_ptr->elements[position]), 0, sizeof(*(vec_ptr->elements))); \
-        vec_ptr->size -= 1; \
+        if (vec_ptr->capacity <= 4) { \
+            memset(&(vec_ptr->elements[vec_ptr->size - 1]), 0, sizeof(element_type)); \
+            vec_ptr->size -= 1; \
+        } \
+        else { \
+            const size_t new_size = vec_ptr->size - 1; \
+            const size_t new_capacity = vec_ptr->capacity / 2; \
+            if (new_capacity > new_size) { \
+                element_type* const new_array = realloc(vec_ptr->elements, new_capacity * sizeof(element_type)); \
+                if (new_array != NULL) { \
+                    vec_ptr->elements = new_array; \
+                    vec_ptr->size = new_size; \
+                    vec_ptr->capacity = new_capacity; \
+                } \
+                else { \
+                    memset(&(vec_ptr->elements[vec_ptr->size - 1]), 0, sizeof(element_type)); \
+                    vec_ptr->size -= 1; \
+                } \
+            } \
+            else { \
+                memset(&(vec_ptr->elements[vec_ptr->size - 1]), 0, sizeof(element_type)); \
+                vec_ptr->size -= 1; \
+            } \
+        } \
     } \
     else { \
-        memmove(&(vec_ptr->elements[position]), &(vec_ptr->elements[position+1]), (vec_ptr->size - (position + 1)) * sizeof(*(vec_ptr->elements))); \
-        memset(&(vec_ptr->elements[vec_ptr->size -1]), 0, sizeof(*(vec_ptr->elements))); \
-        vec_ptr->size -= 1; \
+        const size_t new_size = vec_ptr->size - 1; \
+        const size_t new_capacity = vec_ptr->capacity / 2; \
+        if (new_capacity >= 4 && new_capacity > new_size) { \
+            element_type* const new_array = malloc(new_capacity * sizeof(element_type)); \
+            if (new_array != NULL) { \
+                if (position > 0) { memcpy(new_array, vec_ptr->elements, position * sizeof(element_type)); } \
+                memcpy(&(new_array[position]), &(vec_ptr->elements[position+1]), (vec_ptr->size - (position + 1)) * sizeof(element_type)); \
+                free(vec_ptr->elements); \
+                vec_ptr->elements = new_array; \
+                vec_ptr->size = new_size; \
+                vec_ptr->capacity = new_capacity; \
+            } \
+            else { \
+                memmove(&(vec_ptr->elements[position]), &(vec_ptr->elements[position+1]), (vec_ptr->size - (position + 1)) * sizeof(element_type)); \
+                memset(&(vec_ptr->elements[vec_ptr->size -1]), 0, sizeof(element_type)); \
+                vec_ptr->size -= 1;   \
+            } \
+        } \
+        else { \
+            memmove(&(vec_ptr->elements[position]), &(vec_ptr->elements[position+1]), (vec_ptr->size - (position + 1)) * sizeof(element_type)); \
+            memset(&(vec_ptr->elements[vec_ptr->size -1]), 0, sizeof(element_type)); \
+            vec_ptr->size -= 1; \
+        } \
     } \
 }
 
